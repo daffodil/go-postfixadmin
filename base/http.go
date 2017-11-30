@@ -56,7 +56,7 @@ func AjaxAuth(resp http.ResponseWriter, req *http.Request) bool {
 
 // Writes out the "dict/map" in json to remote http client
 func SendPayload(resp http.ResponseWriter, payload interface{} ) {
-	json_str, _ := json.MarshalIndent(payload, "" , "  ")
+	json_str, _ := json.MarshalIndent(payload, "" , "")
 	fmt.Fprint(resp, string(json_str))
 }
 

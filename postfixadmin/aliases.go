@@ -20,11 +20,10 @@ func GetAliases(domain string) ([]Alias, error) {
 
 	var rows []Alias
 	if DomainExists(domain) == false {
-		return rows, errors.New("Domain '" + domain + "` does not exist")
+		return rows, errors.New("Domain `" + domain + "` does not exist")
 	}
-	var err error
 	Dbo.Where("domain=?", domain).Order("address").Find(&rows)
-	return rows, err
+	return rows, Dbo.Error
 }
 
 // /domain/<domain>/aliases

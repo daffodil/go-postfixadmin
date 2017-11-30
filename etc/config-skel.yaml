@@ -16,6 +16,7 @@ noreply_email: "noreply@example.com"
 
 
 http_listen: "127.0.0.1:23456"
+json_pretty: true
 
 imap_server: "mail.example.com"
 

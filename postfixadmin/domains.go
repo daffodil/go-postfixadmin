@@ -17,7 +17,7 @@ func GetDomains() ([]Domain, error) {
 
 // The ajax struct send as json
 type DomainsPayload struct {
-	Success bool     `json:"success"` // keep extjs happy
+	Success bool     `json:"success"`
 	Domains []Domain `json:"domains"`
 	Error   string   `json:"error"`
 }
@@ -31,7 +31,6 @@ func HandleAjaxDomains(resp http.ResponseWriter, req *http.Request) {
 
 	payload := DomainsPayload{}
 	payload.Success = true
-	//t.Domains = make([]Domain, 0)
 
 	var err error
 	payload.Domains, err = GetDomains()
