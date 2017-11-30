@@ -24,3 +24,6 @@ the url endpoints (TODO: document the urls)
 
 Contributions and feedback welcome
 
+# Documentation
+
+ - godocs at https://godoc.org/github.com/daffodil/go-postfixadmin
