@@ -2,12 +2,10 @@ package main
 
 import (
 	"fmt"
-	//"log"
 	"flag"
 	"io/ioutil"
 	"net/http"
 	"os"
-	//"crypto/tls"
 
 	"github.com/gorilla/mux"
 	"gopkg.in/yaml.v2"

@@ -1,0 +1,54 @@
+
+debug: true
+
+# email send to user instead of admin
+live: false
+
+auth_secret: "cN9voqg6AYM0UhjX9pW2p1ZeiWGSNQw3"
+
+
+email_subject_prefix: "[go-postfixadmin] "
+admin_email: "me@example.com"
+from_email: "postmaster@example.com"
+syslog_email: "postmaster@example.com"
+test_email: "me@example.com"
+noreply_email: "noreply@example.com"
+
+
+http_listen: "127.0.0.1:23456"
+
+imap_server: "mail.example.com"
+
+default_domain: "example.com"
+vacation_domain: "autoreply.example.com"
+
+
+db:
+  engine: mysql
+  user: root
+  password: mash
+  database: mailserver_pfa
+  debug: true
+  table_prefix: ""
+  table_names:
+    admin: admin
+    alias: alias
+    alias_domain: alias_domain
+    config: config
+    domain: domain
+    domain_admins: domain_admins
+    fetchmail: fetchmail
+    log: log
+    mailbox: mailbox
+    vacation: vacation
+    vacation_notification: vacation_notification
+    quota: quota
+    quota2: quota2
+
+
+smtp_server:
+    server: mail.example.com
+    port: 587
+    login: wwwlogin@example.com
+    password: secret999
+    test_mode: true
