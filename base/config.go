@@ -10,9 +10,12 @@ import(
 var conf *Config
 
 type DbConf struct {
-	Engine string ` yaml:"engine" json:"engine" `
-	Datasource string `yaml:"datasource" json:"connect"`
-	Debug bool `yaml:"debug" json:"debug"`
+	Engine string 	`yaml:"engine" json:"engine" `
+	Server string 	`yaml:"server" json:"server"`
+	User string 	`yaml:"user" json:"user"`
+	Password string `yaml:"password" json:"password"`
+	Database string `yaml:"database" json:"database"`
+	Debug bool 		`yaml:"debug" json:"debug"`
 	TableNames map[string]string  `yaml:"table_names" json:"table_names"`
 }
 

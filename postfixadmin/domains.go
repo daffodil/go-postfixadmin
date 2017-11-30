@@ -8,7 +8,7 @@ import (
 )
 
 // Load domains from database
-func LoadDomains() ([]Domain, error) {
+func GetDomains() ([]Domain, error) {
 	var rows []Domain
 	var err error
 	Dbo.Where("domain <> ?", "ALL").Find(&rows)
@@ -34,7 +34,7 @@ func HandleAjaxDomains(resp http.ResponseWriter, req *http.Request) {
 	//t.Domains = make([]Domain, 0)
 
 	var err error
-	payload.Domains, err = LoadDomains()
+	payload.Domains, err = GetDomains()
 	if err != nil {
 		fmt.Println(err)
 		payload.Error = "DB Error: " + err.Error()

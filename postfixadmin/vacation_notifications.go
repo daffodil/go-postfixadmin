@@ -13,7 +13,7 @@ type VacationNotification struct {
 	NotifiedAt string ` json:"notified_at" `
 }
 
-func LoadVacationNotifications(email string, order string) ([]VacationNotification, error) {
+func GetVacationNotifications(email string, order string) ([]VacationNotification, error) {
 	var rows []VacationNotification
 	var err error
 	var order_by string
@@ -26,7 +26,7 @@ func LoadVacationNotifications(email string, order string) ([]VacationNotificati
 	return rows, err
 }
 
-func LoadRecentVacationNotifications() ([]VacationNotification, error) {
+func GetRecentVacationNotifications() ([]VacationNotification, error) {
 	var rows []VacationNotification
 	var err error
 	Dbo.Order("notified_at desc").Limit(100).Find(&rows)
@@ -50,7 +50,7 @@ func HandleAjaxVacationNotifications(resp http.ResponseWriter, req *http.Request
 	payload.Success = true
 
 	var err error
-	payload.Notifications, err = LoadRecentVacationNotifications()
+	payload.Notifications, err = GetRecentVacationNotifications()
 	if err != nil {
 		payload.Error = err.Error()
 	}

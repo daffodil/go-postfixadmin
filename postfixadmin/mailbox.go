@@ -60,7 +60,7 @@ func GetMailboxPassword(email string) (string, error) {
 }
 
 // Load a mailBox record fro the ORM database
-func LoadMailbox(username string) (Mailbox, error) {
+func GetMailbox(username string) (Mailbox, error) {
 	var mailbox Mailbox
 	var err error
 	Dbo.Where("username = ? ", username).First(&mailbox)
@@ -95,7 +95,7 @@ func CreateMailboxPayload() MailboxPayload {
 	return payload
 }
 
-// /ajax/domain/<example.com>/mailbox/<email>
+// /domain/<example.com>/mailbox/<email>
 func HandleAjaxMailbox(resp http.ResponseWriter, req *http.Request) {
 
 	// check we authenticated
@@ -103,7 +103,7 @@ func HandleAjaxMailbox(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//crete ajax payload
+	//create ajax payload
 	payload := CreateMailboxPayload()
 
 	// grab vars from gorilla and in the URL
@@ -138,7 +138,7 @@ func HandleAjaxMailbox(resp http.ResponseWriter, req *http.Request) {
 	var err error
 	exists := MailboxExists(email_addr.Address)
 	if exists {
-		payload.Mailbox, err = LoadMailbox(email_addr.Address)
+		payload.Mailbox, err = GetMailbox(email_addr.Address)
 	}
 	if err != nil {
 		payload.Error = "DB Error: " + err.Error()
@@ -146,26 +146,19 @@ func HandleAjaxMailbox(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Ok so domain and mailbox exists.. Now we can act..
-	// BTW bill this is not in a transaction so far.... arghh..
-
 	var alias *Alias
 
 	switch req.Method {
 
 	case "POST":
-
-		// Its A POST, so parse request..
-		// a gotcha
-		// BILL TODO ;-) as pedro wash hands... ;-))
-		f := req.Form
-		//fmt.Println(f)
+		// TODO: REST , currently is uses POST and form vars
+		form := req.Form
 
 		payload.Mailbox.Username = email_addr.Address
 		payload.Mailbox.Domain = email_addr.Domain
 		payload.Mailbox.LocalPart = email_addr.User
-		payload.Mailbox.Active, _ = strconv.ParseBool(f.Get("active"))
-		payload.Mailbox.Name = f.Get("name")
+		payload.Mailbox.Active, _ = strconv.ParseBool(form.Get("active"))
+		payload.Mailbox.Name = form.Get("name")
 		payload.Mailbox.Maildir = domain + "/" + email_addr.User
 		payload.Mailbox.Quota = 0
 		if payload.Mailbox.Created == "" {
@@ -173,15 +166,15 @@ func HandleAjaxMailbox(resp http.ResponseWriter, req *http.Request) {
 		}
 		payload.Mailbox.Modified = base.NowStr()
 
-		// If mailbox not exist we create, otherwide create and party time
+		// If mailbox not exist we create
 		if exists == false {
 			Dbo.Create(&payload.Mailbox)
 		} else {
 			Dbo.Save(&payload.Mailbox)
 		}
 
-		// This is a mad quirk for postfixadmin.. wtf..
-		// But al emails are an alias.. from high performance systems
+		// This is a mad quirk for postfixadmin..
+		// But all emails are an alias (from high performance systems apparently)
 		if AliasExists(email_addr.Address) == false {
 			alias = &Alias{}
 			alias.Address = email_addr.Address
@@ -189,12 +182,11 @@ func HandleAjaxMailbox(resp http.ResponseWriter, req *http.Request) {
 			alias.Created = base.NowStr()
 			Dbo.Create(&alias)
 		} else {
-			alias, _ = LoadAlias(email_addr.Address)
+			alias, _ = GetAlias(email_addr.Address)
 		}
 
-		//Bill this needs to be in Alias, and the serial in + out
 		alias.ClearAllGoto()
-		aliases_raw := f.Get("aliases")
+		aliases_raw := form.Get("aliases")
 		aliases := strings.Split(aliases_raw, ",")
 		fmt.Println("####", aliases_raw, aliases)
 		for _, a := range aliases {
@@ -203,17 +195,15 @@ func HandleAjaxMailbox(resp http.ResponseWriter, req *http.Request) {
 		alias.Save()
 
 		// WOW dodgy////
-		if f.Get("password") != "" {
-			SetMailboxPassword(payload.Mailbox.Username, f.Get("password"))
+		if form.Get("password") != "" {
+			SetMailboxPassword(payload.Mailbox.Username, form.Get("password"))
 		}
 
 		payload.Aliases = alias.Goto
 
-		fmt.Println("------------------ POSTED-------------", f.Get("password"))
-
 	case "GET":
 
-		alias, _ = LoadAlias(email_addr.Address)
+		alias, _ = GetAlias(email_addr.Address)
 		payload.Aliases = alias.Goto
 		// just pass through vars
 

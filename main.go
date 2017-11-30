@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -38,16 +38,17 @@ func main() {
 	}
 
 	// Create Database connection + ping
+	data_source := config.Db.User + ":" + config.Db.Password + "@" + config.Db.Server + "/" + config.Db.Database
 	var Db *sql.DB
 	var err_db error
-	Db, err_db = sql.Open(config.Db.Engine, config.Db.Datasource)
+	Db, err_db = sql.Open(config.Db.Engine, data_source)
 	if err_db != nil {
-		fmt.Printf("Db Login Failed: ", err_db, "=", config.Db.Engine, config.Db.Datasource)
+		fmt.Printf("Db Login Failed: ", err_db, "=", config.Db.Engine, data_source)
 		os.Exit(1)
 	}
 	err_ping := Db.Ping()
 	if err_ping != nil {
-		fmt.Printf("Db Ping Failed: ", err_ping, "=", config.Db.Engine, config.Db.Datasource)
+		fmt.Printf("Db Ping Failed: ", err_ping, "=", config.Db.Engine, data_source)
 		os.Exit(1)
 	}
 	defer Db.Close()

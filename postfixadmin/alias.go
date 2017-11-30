@@ -85,7 +85,7 @@ func AliasExists(address string) bool {
 	return true
 }
 
-func LoadAlias(email string) (*Alias, error) {
+func GetAlias(email string) (*Alias, error) {
 
 	alias := new(Alias)
 	var err error
@@ -137,7 +137,7 @@ func HandleAjaxAlias(resp http.ResponseWriter, req *http.Request) {
 	alias_exists := AliasExists(addr.Address)
 
 	if alias_exists {
-		payload.Alias, err = LoadAlias(addr.Address)
+		payload.Alias, err = GetAlias(addr.Address)
 		if err != nil {
 			fmt.Println(err)
 			payload.Error = "DB Error: " + err.Error()

@@ -136,7 +136,7 @@ func DeleteVacation(status string, v *Vacation) string {
 	if true || Conf.Live == true {
 		//Dbo.Delete(&v)
 		m += "## Deleted ##\n"
-		nos, err := LoadVacationNotifications(v.Email, "email")
+		nos, err := GetVacationNotifications(v.Email, "email")
 		if err == nil {
 		}
 		for _, r := range nos {

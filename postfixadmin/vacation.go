@@ -52,7 +52,7 @@ func IsVacationAddress(address string) bool {
 }
 
 // Load vacation record from db
-func LoadVacation(email string) (*Vacation, error) {
+func GetVacation(email string) (*Vacation, error) {
 	row := new(Vacation)
 	var err error
 	Dbo.Where("email = ?", email).Find(&row)
@@ -97,7 +97,7 @@ func HandleAjaxVacation(resp http.ResponseWriter, req *http.Request) {
 			var err error
 			if VacationExists(email_addr.Address) {
 
-				payload.Vacation, err = LoadVacation(email_addr.Address)
+				payload.Vacation, err = GetVacation(email_addr.Address)
 				if err != nil {
 					fmt.Println(err)
 					payload.Error = "DB Error: " + err.Error()
@@ -132,7 +132,7 @@ func HandleAjaxVacation(resp http.ResponseWriter, req *http.Request) {
 					// probably record not exist
 					payload.Vacation.Email = email_addr.Address
 				} else {
-					payload.VacationNotifications, err = LoadVacationNotifications(email_addr.Address, "date")
+					payload.VacationNotifications, err = GetVacationNotifications(email_addr.Address, "date")
 				}
 			}
 		}
@@ -144,7 +144,7 @@ func HandleAjaxVacation(resp http.ResponseWriter, req *http.Request) {
 // Updates a Vacation record
 func UpdateVacationAlias(vac *Vacation) {
 
-	alias, err := LoadAlias(vac.Email)
+	alias, err := GetAlias(vac.Email)
 	fmt.Println("UpdateVacationAlias", alias, err)
 	if err != nil {
 		// do something
