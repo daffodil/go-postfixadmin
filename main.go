@@ -63,6 +63,7 @@ func main() {
 	router := mux.NewRouter()
 
 	//= Base
+	router.HandleFunc("/api/v1", base.HandleAjaxInfo)
 	router.HandleFunc("/api/v1/admin/cron", base.HandleAjaxCron)
 
 	//= Postfixadmin

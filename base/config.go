@@ -9,32 +9,15 @@ import(
 // Main config pointer
 var conf *Config
 
-type DbConf struct {
-	Engine string 	`yaml:"engine" json:"engine" `
-	Server string 	`yaml:"server" json:"server"`
-	User string 	`yaml:"user" json:"user"`
-	Password string `yaml:"password" json:"password"`
-	Database string `yaml:"database" json:"database"`
-	Debug bool 		`yaml:"debug" json:"debug"`
-	TableNames map[string]string  `yaml:"table_names" json:"table_names"`
-}
 
-type SMTPConf struct {
-	Server string 	` yaml:"server" json:"server" `
-	Port int 		` yaml:"port" json:"port" `
-	Login string 	`yaml:"login" json:"login"`
-	Password string 	`yaml:"password" json:"password"`
-	TestMode bool `yaml:"test_mode" json:"test_mode"`
-	//TestEmail string `yaml:"test_email" json:"test_email"`
-}
 
-// The main `config.yaml` reader struct where yaml is serialed into
+// The main `config.yaml` reader/struct
 type Config struct {
 
 	Debug bool `yaml:"debug" json:"debug" `
 	Live bool `yaml:"live" json:"live" `
 
-	AuthSecret string `yaml:"auth_secret" json:"auth_secret" `
+	Token TokenConf `yaml:"token" json:"token" `
 
 	EmailPrefix string `yaml:"email_prefix" json:"email_prefix" `
 	AdminEmail string `yaml:"admin_email" json:"admin_email" `
@@ -57,7 +40,31 @@ type Config struct {
 }
 
 
+// Database config (TODO: xtra params, ssl et all)
+type DbConf struct {
+	Engine string 	`yaml:"engine" json:"engine" `
+	Server string 	`yaml:"server" json:"server"`
+	User string 	`yaml:"user" json:"user"`
+	Password string `yaml:"password" json:"password"`
+	Database string `yaml:"database" json:"database"`
+	Debug bool 		`yaml:"debug" json:"debug"`
+	TableNames map[string]string  `yaml:"table_names" json:"table_names"`
+}
 
+// SMTP server config
+type SMTPConf struct {
+	Server string 	` yaml:"server" json:"server" `
+	Port int 		` yaml:"port" json:"port" `
+	Login string 	`yaml:"login" json:"login"`
+	Password string 	`yaml:"password" json:"password"`
+	TestMode bool `yaml:"test_mode" json:"test_mode"`
+	//TestEmail string `yaml:"test_email" json:"test_email"`
+}
 
-
-
+// Simple TOKEN auth
+type TokenConf struct {
+	Active bool 	` yaml:"active" json:"active" `
+	Secret string  	` yaml:"secret" json:"secret" `
+	Header string 	` yaml:"header" json:"header"`
+	Ips []string 	` yaml:"ips" json:"ips"`
+}

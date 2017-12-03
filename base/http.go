@@ -6,6 +6,7 @@ import(
 	"fmt"
 	"net/http"
 	"encoding/json"
+
 )
 
 // Return ajax struct created in error,,
@@ -31,27 +32,25 @@ func AjaxAuth(resp http.ResponseWriter, req *http.Request) bool {
 	// Set Ajax Headers ie were in json land
 	resp.Header().Set("Content-Type", "application/json")
 
-
-	switch req.Method {
-
-	// A HTTP POST so check the auth secret
-	case "POST":
-		req.ParseForm()
-		if req.Form.Get("auth") != conf.AuthSecret {
-			http.Error(resp, CreatePermissionErrPayload(), 500)
+	// simple token auth
+	if conf.Token.Active {
+		token := req.Header.Get(conf.Token.Header)
+		if len(token) == 0 {
 			return false
 		}
-
-	// This is well dodgy here bill.. make it GET only as its assumed ???
-	default:
-
-		if req.URL.Query().Get("auth") != conf.AuthSecret {
-			http.Error(resp, CreatePermissionErrPayload(), 500)
-			return false
+		if token != conf.Token.Secret {
+			return false;
 		}
+		// check ip match
+		real_ip := req.Header.Get("X-Real-IP")
+		for _, v := range conf.Token.Ips {
+			if v == real_ip {
+				return true
+			}
+		}
+
 	}
-
-	return true
+	return false
 }
 
 // Writes out the "dict/map" in json to remote http client
@@ -74,4 +73,18 @@ func SendErrorPayload(resp http.ResponseWriter, err string){
 	payload.Error = err
 
 	SendPayload(resp, payload)
+}
+
+
+//  /api/v1 info
+func HandleAjaxInfo(resp http.ResponseWriter, req *http.Request) {
+
+	pay := make(map[string]string)
+
+	pay["real_ip"] = req.Header.Get("X-Real-IP")
+	pay["remote_addr"] = req.RemoteAddr
+
+	SendPayload(resp, pay)
+
+
 }

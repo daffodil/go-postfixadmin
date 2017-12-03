@@ -1,10 +1,18 @@
 
 debug: true
 
-# email send to user instead of admin
+# email sent to user instead of admin when live
 live: false
 
-auth_secret: "cN9voqg6AYM0UhjX9pW2p1ZeiWGSNQw3"
+http_listen: "127.0.0.1:23456"
+json_pretty: true
+
+token:
+  header: "X-GO-POSTFIXADMIN-SECRET"
+  secret: "cN9voqg6AYM0UhjX9pW2p1ZeiWGSNQw3"
+  ips:
+   - "127.0.0.1"
+   - "56.45.56.45"
 
 
 email_subject_prefix: "[go-postfixadmin] "
@@ -15,8 +23,7 @@ test_email: "me@example.com"
 noreply_email: "noreply@example.com"
 
 
-http_listen: "127.0.0.1:23456"
-json_pretty: true
+
 
 imap_server: "mail.example.com"
 
