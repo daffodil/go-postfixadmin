@@ -3,7 +3,9 @@ go-postfixadmin
 
 A simple ajax app+api in golang to manage a [postfixadmin](https://github.com/postfixadmin) flavoured postfix server. (WIP and not serious yet)
 
-- It's being used in production running on a dedicated server, with a simple token authentication and plain text auth (legacy reasons!).
+- It's being used in production running on a dedicated server
+  - with a simple token authentication and plain text auth (legacy reasons!)
+  - sits behind an nginx as proxy kinda microservice
 - The `/mailbox/*` like others is wip and experiment in returning imap mailboxes via json
 - TODO: proper authentiction, encryption, true REST, use postfixadmin encryption login etc.
 - Help+advice wanted from golang devs and postfixadmin users

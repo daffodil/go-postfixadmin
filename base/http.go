@@ -35,21 +35,19 @@ func AjaxAuth(resp http.ResponseWriter, req *http.Request) bool {
 	// simple token auth
 	if conf.Token.Active {
 		token := req.Header.Get(conf.Token.Header)
-		if len(token) == 0 {
-			return false
-		}
-		if token != conf.Token.Secret {
-			return false;
-		}
-		// check ip match
-		real_ip := req.Header.Get("X-Real-IP")
-		for _, v := range conf.Token.Ips {
-			if v == real_ip {
-				return true
+		if len(token) > 5 && token != conf.Token.Secret {
+
+			// check ip match
+			real_ip := req.Header.Get("X-Real-IP")
+			for _, v := range conf.Token.Ips {
+				if v == real_ip {
+					return true
+				}
 			}
 		}
-
 	}
+	resp.WriteHeader(http.StatusUnauthorized)
+	resp.Write([]byte("500 - postfixadmin permission error"))
 	return false
 }
 
