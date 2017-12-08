@@ -4,10 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/urfave/negroni"
 	"gopkg.in/yaml.v2"
 
 	"database/sql"
@@ -59,32 +59,40 @@ func main() {
 	postfixadmin.Initialize(config, Db)
 	sendmail.Initialize(config)
 
-	// Setup www router and config modules
+
+	// Main router
+	BASE := "/api/v1"
 	router := mux.NewRouter()
 
 	//= Base
-	router.HandleFunc("/api/v1", base.HandleAjaxInfo)
-	router.HandleFunc("/api/v1/admin/cron", base.HandleAjaxCron)
+	router.HandleFunc(BASE, base.HandleAjaxInfo)
+
 
 	//= Postfixadmin
-	router.HandleFunc("/api/v1/admin/domains", postfixadmin.HandleAjaxDomains)
-	router.HandleFunc("/api/v1/admin/domain/{domain}", postfixadmin.HandleAjaxDomain)
-	router.HandleFunc("/api/v1/admin/domain/{domain}/all", postfixadmin.HandleAjaxDomainAll)
-	router.HandleFunc("/api/v1/admin/domain/{domain}/vacations", postfixadmin.HandleAjaxVacations)
-	router.HandleFunc("/api/v1/admin/domain/{domain}/mailboxes", postfixadmin.HandleAjaxMailboxes)
-	router.HandleFunc("/api/v1/admin/domain/{domain}/virtual", postfixadmin.HandleAjaxDomainVirtual)
+	//pfaRouter := mux.NewRouter().PathPrefix(BASE + "/admin").Subrouter().StrictSlash(true)
+	pfaRouter := router.PathPrefix("/admin").Subrouter()
 
-	router.HandleFunc("/api/v1/admin/domain/{domain}/mailbox/{username}", postfixadmin.HandleAjaxMailbox)
+	pfaRouter.HandleFunc("/domains", postfixadmin.HandleAjaxDomains)
+	pfaRouter.HandleFunc("/domain/{domain}", postfixadmin.HandleAjaxDomain)
+	pfaRouter.HandleFunc("/domain/{domain}/all", postfixadmin.HandleAjaxDomainAll)
+	pfaRouter.HandleFunc("/domain/{domain}/vacations", postfixadmin.HandleAjaxVacations)
+	pfaRouter.HandleFunc("/domain/{domain}/mailboxes", postfixadmin.HandleAjaxMailboxes)
+	pfaRouter.HandleFunc("/domain/{domain}/virtual", postfixadmin.HandleAjaxDomainVirtual)
 
-	router.HandleFunc("/api/v1/admin/mailbox/{email}", postfixadmin.HandleAjaxMailbox)
-	router.HandleFunc("/api/v1/admin/mailbox/{email}/vacation", postfixadmin.HandleAjaxVacation)
-	router.HandleFunc("/api/v1/admin/mailbox/{email}/set_secret", postfixadmin.HandleAjaxSetMailboxPassword)
-	router.HandleFunc("/api/v1/admin/mailbox/{email}/send_test", postfixadmin.HandleAjaxMailboxSendTest)
+	pfaRouter.HandleFunc("/domain/{domain}/mailbox/{username}", postfixadmin.HandleAjaxMailbox)
 
-	router.HandleFunc("/api/v1/admin/alias/{email}", postfixadmin.HandleAjaxAlias)
-	router.HandleFunc("/api/v1/admin/domain/{domain}/aliases", postfixadmin.HandleAjaxAliases)
+	pfaRouter.HandleFunc("/mailbox/{email}", postfixadmin.HandleAjaxMailbox)
+	pfaRouter.HandleFunc("/mailbox/{email}/vacation", postfixadmin.HandleAjaxVacation)
+	pfaRouter.HandleFunc("/mailbox/{email}/set_secret", postfixadmin.HandleAjaxSetMailboxPassword)
+	pfaRouter.HandleFunc("/mailbox/{email}/send_test", postfixadmin.HandleAjaxMailboxSendTest)
 
-	router.HandleFunc("/api/v1/admin/vacation/notifications", postfixadmin.HandleAjaxVacationNotifications)
+	pfaRouter.HandleFunc("/alias/{email}", postfixadmin.HandleAjaxAlias)
+	pfaRouter.HandleFunc("/domain/{domain}/aliases", postfixadmin.HandleAjaxAliases)
+
+	pfaRouter.HandleFunc("/vacation/notifications", postfixadmin.HandleAjaxVacationNotifications)
+
+	pfaRouter.HandleFunc("/api/v1/admin/cron", base.HandleAjaxCron)
+
 
 	//= SendMail
 	router.HandleFunc("/api/v1/smtp/send_test", sendmail.HandleAjaxSendTest)
@@ -94,9 +102,22 @@ func main() {
 	router.HandleFunc("/api/v1/mailbox/{address}/folders", mailbox.HandleAjaxFolders)
 	router.HandleFunc("/api/v1/mailbox/{address}/message/{folder}/{uid}", mailbox.AjaxMessageHandler)
 
+	//router.PathPrefix(BASE + "/admin").Handler(negroni.New(
+	//	Middleware1,
+	//	Middleware2,
+	//	negroni.Wrap(subRouter),
+	//))
+	common_midware := negroni.New()
+	common_midware.UseHandler(router)
+
+	//router.PathPrefix(BASE + "/admin").Handler(common_midware.With(
+		//APIMiddleware1,
+	//	negroni.Wrap(pfaRouter),
+	//))
 	// Start Http Server
 	fmt.Println("Serving on " + config.HTTPListen)
-	http.Handle("/", router)
-	http.ListenAndServe(config.HTTPListen, nil)
+	//http.Handle("/", router)
+	//http.ListenAndServe(config.HTTPListen, n)
+	common_midware.Run(config.HTTPListen)
 
 }
