@@ -19,7 +19,9 @@ type Config struct {
 
 	HTTPListen string `yaml:"http_listen" json:"http_listen"`
 
-	// Return HTTP status codes, in addition to json
+	// If true with return HTTP status error codes, in addition to json.
+	// Eg an authentication error of 304, in addition to the json data error
+	// Some application would want to have 200 ok, and the error in json
 	HTTPErrors bool `yaml:"http_errors" json:"http_errors"`
 	JSONPretty bool `yaml:"json_pretty" json:"json_pretty"`
 

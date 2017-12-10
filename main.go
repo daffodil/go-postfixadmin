@@ -64,15 +64,14 @@ func App(config_file string) http.Handler {
 	sendmail.Initialize(config)
 
 	// Main router
-	BASE := "/api/v1"
 	router := mux.NewRouter().StrictSlash(false)
 
-	//= Base
-	router.HandleFunc(BASE, base.HandleAjaxInfo)
+	// base mapping
+	router.HandleFunc(base.V1_BASE, base.HandleAjaxInfo)
+	router.HandleFunc(base.V1_BASE  + "/smtp/send_test", sendmail.HandleAjaxSendTest)
 
-	//= Postfixadmin
-	//pfaRouter := mux.NewRouter().PathPrefix(BASE + "/admin").Subrouter().StrictSlash(true)
-	pfaRouter := router.PathPrefix(BASE + "/admin").Subrouter()
+	//========= Postfixadmin
+	pfaRouter := router.PathPrefix(base.V1_BASE + "/admin").Subrouter()
 
 	pfaRouter.HandleFunc("/domains", postfixadmin.HandleAjaxDomains)
 	pfaRouter.HandleFunc("/domain/{domain}", postfixadmin.HandleAjaxDomain)
@@ -95,13 +94,12 @@ func App(config_file string) http.Handler {
 
 	pfaRouter.HandleFunc("/api/v1/admin/cron", base.HandleAjaxCron)
 
-	//= SendMail
-	router.HandleFunc("/api/v1/smtp/send_test", sendmail.HandleAjaxSendTest)
 
-	//= Mailbox
-	router.HandleFunc("/api/v1/mailbox/{address}/summary", mailbox.HandleAjaxSummary)
-	router.HandleFunc("/api/v1/mailbox/{address}/folders", mailbox.HandleAjaxFolders)
-	router.HandleFunc("/api/v1/mailbox/{address}/message/{folder}/{uid}", mailbox.AjaxMessageHandler)
+	//========= Mailbox
+	mboxRouter := router.PathPrefix(base.V1_BASE + "/mailbox").Subrouter()
+	mboxRouter.HandleFunc("/mailbox/{address}/summary", mailbox.HandleAjaxSummary)
+	mboxRouter.HandleFunc("/mailbox/{address}/folders", mailbox.HandleAjaxFolders)
+	mboxRouter.HandleFunc("/mailbox/{address}/message/{folder}/{uid}", mailbox.AjaxMessageHandler)
 
 	// Setup middleware
 	neg := negroni.Classic()
@@ -113,8 +111,6 @@ func App(config_file string) http.Handler {
 }
 
 func main(){
-	// Start Http Server
-	//neg := App()
 	//defer Db.Close()
 
 	config_file := flag.String("config", "config.yaml", "Config file")

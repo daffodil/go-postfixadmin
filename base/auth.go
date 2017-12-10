@@ -30,13 +30,18 @@ func AuthMiddleware(rw http.ResponseWriter, req *http.Request, next http.Handler
 			}
 		}
 	}
-	fmt.Println("AUTH FAIL")
-	if conf.HTTPErrors {
-		http.Error(rw, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+	if false {
+		fmt.Println("AUTH FAIL")
+		WriteErrorJSON(rw, "Authentication Failed")
+		if conf.HTTPErrors {
+			http.Error(rw, "", http.StatusForbidden)
+		}
+		return
 	}
-	WriteErrorJSON(rw, "Authentication Failed")
-	return
-	fmt.Println("AUTH FAIL after")
+
+
+	//fmt.Println("AUTH FAIL after")
 	next(rw, req)
+
 	// do some stuff after
 }
