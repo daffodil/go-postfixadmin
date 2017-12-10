@@ -9,6 +9,10 @@ import(
 
 )
 
+const(
+	V1_BASE = "/api/v1"
+)
+
 // Return ajax struct created in error,,
 type ErrPayload struct {
 	Success bool `json:"success"` // keep extjs happy
@@ -27,12 +31,13 @@ func CreatePermissionErrPayload() string {
 
 // This is atmo a simple auth mechanism
 // and a pass down the line function shite.. which golang does..
-func AjaxAuth(resp http.ResponseWriter, req *http.Request) bool {
+func DEADAjaxAuth(resp http.ResponseWriter, req *http.Request) bool {
 
 	// Set Ajax Headers ie were in json land
 	resp.Header().Set("Content-Type", "application/json")
 
 	// simple token auth
+	/*
 	if conf.Token.Active {
 		token := req.Header.Get(conf.Token.Header)
 		if len(token) > 5 && token != conf.Token.Secret {
@@ -45,15 +50,19 @@ func AjaxAuth(resp http.ResponseWriter, req *http.Request) bool {
 				}
 			}
 		}
-	}
+	} */
 	resp.WriteHeader(http.StatusUnauthorized)
 	resp.Write([]byte("500 - postfixadmin permission error"))
 	return false
 }
 
-// Writes out the "dict/map" in json to remote http client
-func SendPayload(resp http.ResponseWriter, payload interface{} ) {
-	json_str, _ := json.MarshalIndent(payload, "" , "")
+// Writes out the payload in json
+func WriteJSON(resp http.ResponseWriter, payload interface{} ) {
+	indent := ""
+	if conf.JSONPretty {
+		indent = "  "
+	}
+	json_str, _ := json.MarshalIndent(payload, "" , indent)
 	fmt.Fprint(resp, string(json_str))
 }
 
@@ -64,13 +73,13 @@ type ErrorPayload struct {
 }
 
 // Send the error payload json enoded to client..
-func SendErrorPayload(resp http.ResponseWriter, err string){
+func WriteErrorJSON(resp http.ResponseWriter, err string){
 
 	payload := new(ErrorPayload)
 	payload.Success = true
 	payload.Error = err
 
-	SendPayload(resp, payload)
+	WriteJSON(resp, payload)
 }
 
 
@@ -82,7 +91,7 @@ func HandleAjaxInfo(resp http.ResponseWriter, req *http.Request) {
 	pay["real_ip"] = req.Header.Get("X-Real-IP")
 	pay["remote_addr"] = req.RemoteAddr
 
-	SendPayload(resp, pay)
+	WriteJSON(resp, pay)
 
 
 }

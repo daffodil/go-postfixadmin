@@ -45,9 +45,9 @@ type CronPayload struct {
 // TODO
 func HandleAjaxCron(resp http.ResponseWriter, req *http.Request) {
 
-	if AjaxAuth(resp, req) == false {
-		return
-	}
+	//if AjaxAuth(resp, req) == false {
+	//	return
+	//}
 
 	pay := CronPayload{}
 
@@ -57,7 +57,7 @@ func HandleAjaxCron(resp http.ResponseWriter, req *http.Request) {
 		fmt.Println(e.Next, reflect.TypeOf(e.Job))
 	}
 
-	SendPayload(resp, pay)
+	WriteJSON(resp, pay)
 
 
 }

@@ -13,11 +13,11 @@ var Conf *base.Config
 var Dbo *gorm.DB
 
 // Initializes the postfix admin module..
-func Initialize(conff *base.Config, db *sql.DB) {
+func Initialize(conf *base.Config, db *sql.DB) {
 
-	Conf = conff
+	Conf = conf
 
-	// This is bummer cos I want to use db.Driver.Name or alike instead of a new function var
+	// Create gorm instance
 	var err error
 	Dbo, err = gorm.Open(Conf.Db.Engine, db)
 	if err != nil {
@@ -26,7 +26,7 @@ func Initialize(conff *base.Config, db *sql.DB) {
 	Dbo.SingularTable(true)
 	Dbo.LogMode(Conf.Debug)
 
-	// TODO OOps a daisy.. in the nettles
+	// TODO Start cron
 	//base.Cron.AddFunc("@every 5s", VacationsExpire)
 
 }

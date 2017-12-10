@@ -24,12 +24,7 @@ type DomainsPayload struct {
 
 // /domains
 func HandleAjaxDomains(resp http.ResponseWriter, req *http.Request) {
-	fmt.Println("DomainsAjaxHandler")
-	if base.AjaxAuth(resp, req) == false {
-		//base.SendErrorPayload("")
-		return
-	}
-
+	fmt.Println( "DOMAINSSS")
 	payload := DomainsPayload{}
 	payload.Success = true
 
@@ -40,5 +35,5 @@ func HandleAjaxDomains(resp http.ResponseWriter, req *http.Request) {
 		payload.Error = "DB Error: " + err.Error()
 	}
 
-	base.SendPayload(resp, payload)
+	base.WriteJSON(resp, payload)
 }

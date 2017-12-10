@@ -98,11 +98,6 @@ func CreateMailboxPayload() MailboxPayload {
 // /domain/<example.com>/mailbox/<email>
 func HandleAjaxMailbox(resp http.ResponseWriter, req *http.Request) {
 
-	// check we authenticated
-	if base.AjaxAuth(resp, req) == false {
-		return
-	}
-
 	//create ajax payload
 	payload := CreateMailboxPayload()
 
@@ -115,7 +110,7 @@ func HandleAjaxMailbox(resp http.ResponseWriter, req *http.Request) {
 	errdom := IsDomainValid(domain)
 	if errdom != nil {
 		payload.Error = errdom.Error()
-		base.SendPayload(resp, payload)
+		base.WriteJSON(resp, payload)
 		return
 	}
 
@@ -123,14 +118,14 @@ func HandleAjaxMailbox(resp http.ResponseWriter, req *http.Request) {
 	email_addr, err_email := ParseAddress(username)
 	if err_email != nil {
 		payload.Error = err_email.Error()
-		base.SendPayload(resp, payload)
+		base.WriteJSON(resp, payload)
 		return
 	}
 
 	// check email and domain match
 	if payload.Error != "" && email_addr.Domain != domain {
 		payload.Error = errors.New(" Domain and email domain do not match").Error()
-		base.SendPayload(resp, payload)
+		base.WriteJSON(resp, payload)
 		return
 	}
 
@@ -142,7 +137,7 @@ func HandleAjaxMailbox(resp http.ResponseWriter, req *http.Request) {
 	}
 	if err != nil {
 		payload.Error = "DB Error: " + err.Error()
-		base.SendPayload(resp, payload)
+		base.WriteJSON(resp, payload)
 		return
 	}
 
@@ -209,7 +204,7 @@ func HandleAjaxMailbox(resp http.ResponseWriter, req *http.Request) {
 
 	}
 
-	base.SendPayload(resp, payload)
+	base.WriteJSON(resp, payload)
 }
 
 type MailboxPassPayload struct {
@@ -221,9 +216,6 @@ type MailboxPassPayload struct {
 
 func HandleAjaxSetMailboxPassword(resp http.ResponseWriter, req *http.Request) {
 
-	if base.AjaxAuth(resp, req) == false {
-		return
-	}
 
 	payload := MailboxPassPayload{}
 	payload.Success = true
@@ -236,7 +228,7 @@ func HandleAjaxSetMailboxPassword(resp http.ResponseWriter, req *http.Request) {
 	if err_email != nil {
 		payload.Error = err_email.Error()
 		payload.Ok = false
-		base.SendPayload(resp, payload)
+		base.WriteJSON(resp, payload)
 		return
 	}
 
@@ -250,7 +242,7 @@ func HandleAjaxSetMailboxPassword(resp http.ResponseWriter, req *http.Request) {
 		payload.Message = "Password Set"
 	}
 
-	base.SendPayload(resp, payload)
+	base.WriteJSON(resp, payload)
 
 }
 
@@ -263,9 +255,6 @@ type SendTestMailPayload struct {
 
 func HandleAjaxMailboxSendTest(resp http.ResponseWriter, req *http.Request) {
 
-	if base.AjaxAuth(resp, req) == false {
-		return
-	}
 
 	payload := SendTestMailPayload{}
 	payload.Success = true
@@ -276,7 +265,7 @@ func HandleAjaxMailboxSendTest(resp http.ResponseWriter, req *http.Request) {
 	if err_email != nil {
 		payload.Error = err_email.Error()
 		payload.Ok = false
-		base.SendPayload(resp, payload)
+		base.WriteJSON(resp, payload)
 		return
 	}
 
@@ -294,5 +283,5 @@ func HandleAjaxMailboxSendTest(resp http.ResponseWriter, req *http.Request) {
 		payload.Error = err.Error()
 	}
 
-	base.SendPayload(resp, payload)
+	base.WriteJSON(resp, payload)
 }

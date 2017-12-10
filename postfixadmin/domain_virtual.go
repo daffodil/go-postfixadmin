@@ -4,13 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	//"errors"
 	"strings"
 
 	"github.com/cenkalti/log"
 	"github.com/gorilla/mux"
 
-	"github.com/daffodil/go-postfixadmin/base"
 )
 
 // Struct for a virtual mailbox, and releated data
@@ -42,11 +40,6 @@ func GetMailboxesVirtual(domain string) ([]*MailboxVirtual, error) {
 
 //  /domain/{domain}/virtual
 func HandleAjaxDomainVirtual(resp http.ResponseWriter, req *http.Request) {
-
-	if base.AjaxAuth(resp, req) == false {
-		return
-	}
-	log.Info("DomainVirtualAjaxHandler")
 
 	vars := mux.Vars(req)
 	domain := vars["domain"]

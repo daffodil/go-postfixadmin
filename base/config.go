@@ -17,7 +17,13 @@ type Config struct {
 	Debug bool `yaml:"debug" json:"debug" `
 	Live bool `yaml:"live" json:"live" `
 
-	Token TokenConf `yaml:"token" json:"token" `
+	HTTPListen string `yaml:"http_listen" json:"http_listen"`
+
+	// Return HTTP status codes, in addition to json
+	HTTPErrors bool `yaml:"http_errors" json:"http_errors"`
+	JSONPretty bool `yaml:"json_pretty" json:"json_pretty"`
+
+	Tokens []TokenConf `yaml:"tokens" json:"tokens" `
 
 	EmailPrefix string `yaml:"email_prefix" json:"email_prefix" `
 	AdminEmail string `yaml:"admin_email" json:"admin_email" `
@@ -31,12 +37,12 @@ type Config struct {
 	DefaultDomain string `yaml:"default_domain" json:"default_domain" `
 	VacationDomain string `yaml:"vacation_domain" json:"vacation_domain" `
 
-	HTTPListen string `yaml:"http_listen" json:"http_listen"`
-	//IMAPAddress string `yaml:"imap_adddress" json:"imap_adddress"`
 
-	SMTPLogin SMTPConf `yaml:"smtp" json:"smtp"`
 
-	ImapServer string `yaml:"imap_server" json:"imap_server"`
+
+	SMTPServer SMTPConf `yaml:"smtp" json:"smtp"`
+
+	IMAPServer IMAPConf `yaml:"imap" json:"imap"`
 }
 
 
@@ -60,6 +66,13 @@ type SMTPConf struct {
 	TestMode bool `yaml:"test_mode" json:"test_mode"`
 	//TestEmail string `yaml:"test_email" json:"test_email"`
 }
+
+// IMAP server
+type IMAPConf struct {
+	Active bool 	` yaml:"active" json:"active" `
+	Server string  	` yaml:"server" json:"server" `
+}
+
 
 // Simple TOKEN auth
 type TokenConf struct {

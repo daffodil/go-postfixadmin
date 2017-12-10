@@ -71,10 +71,6 @@ type DomainPayload struct {
 // /domain/{domain}
 func HandleAjaxDomain(resp http.ResponseWriter, req *http.Request) {
 
-	log.Info("AjaxHandleDomain")
-	if base.AjaxAuth(resp, req) == false {
-		return
-	}
 	vars := mux.Vars(req)
 	// TODO check var is valid
 
@@ -88,7 +84,7 @@ func HandleAjaxDomain(resp http.ResponseWriter, req *http.Request) {
 		payload.Error = "" + err.Error()
 	}
 
-	base.SendPayload(resp, payload)
+	base.WriteJSON(resp, payload)
 
 }
 
@@ -103,11 +99,6 @@ type DomainAllPayload struct {
 
 //  /ajax/domain/{domain}/all
 func HandleAjaxDomainAll(resp http.ResponseWriter, req *http.Request) {
-
-	if base.AjaxAuth(resp, req) == false {
-		return
-	}
-	log.Info("DomainAllAjaxHandler")
 
 	vars := mux.Vars(req)
 	domain := vars["domain"]
@@ -132,5 +123,5 @@ func HandleAjaxDomainAll(resp http.ResponseWriter, req *http.Request) {
 		payload.Error = "" + err.Error()
 	}
 
-	base.SendPayload(resp, payload)
+	base.WriteJSON(resp, payload)
 }

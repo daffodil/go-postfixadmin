@@ -31,11 +31,7 @@ func GetVacations(domain string) ([]*Vacation, error) {
 // /domain/<domain>/vacations
 func HandleAjaxVacations(resp http.ResponseWriter, req *http.Request) {
 
-	if base.AjaxAuth(resp, req) == false {
-		return
-	}
 
-	fmt.Println("VacationsAjaxHandler")
 	vars := mux.Vars(req)
 
 	payload := VacationsPayload{}
@@ -49,6 +45,6 @@ func HandleAjaxVacations(resp http.ResponseWriter, req *http.Request) {
 		payload.Error = "DB Error: " + err.Error()
 	}
 
-	base.SendPayload(resp, payload)
+	base.WriteJSON(resp, payload)
 
 }

@@ -16,7 +16,6 @@ import(
 	"github.com/mxk/go-imap/imap"
 	"github.com/jhillyerd/go.enmime"
 
-	"github.com/daffodil/go-postfixadmin/base"
 )
 
 type XMeta struct {
@@ -189,11 +188,6 @@ type MessagePayload struct {
 
 func AjaxMessageHandler(resp http.ResponseWriter, req *http.Request) {
 
-
-	//= Setup AJAX Payload
-	if base.AjaxAuth(resp, req) == false {
-		return
-	}
 
 	client := CreateImapClient(resp, req)
 	if client == nil {

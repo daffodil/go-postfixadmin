@@ -29,10 +29,6 @@ func GetAliases(domain string) ([]Alias, error) {
 // /domain/<domain>/aliases
 func HandleAjaxAliases(resp http.ResponseWriter, req *http.Request) {
 
-	if base.AjaxAuth(resp, req) == false {
-		return
-	}
-	fmt.Println("AliasesAjaxHandler")
 	vars := mux.Vars(req)
 
 	payload := AliasesPayload{}
@@ -46,5 +42,5 @@ func HandleAjaxAliases(resp http.ResponseWriter, req *http.Request) {
 		payload.Error = "Error: " + err.Error()
 	}
 
-	base.SendPayload(resp, payload)
+	base.WriteJSON(resp, payload)
 }

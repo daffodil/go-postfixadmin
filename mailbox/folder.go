@@ -95,10 +95,6 @@ type FoldersPayload struct {
 // /mailbox/<email>/folders
 func HandleAjaxFolders(resp http.ResponseWriter, req *http.Request) {
 
-	if base.AjaxAuth(resp, req) == false {
-		return
-	}
-
 	client := CreateImapClient(resp, req)
 	if client == nil {
 		return
@@ -114,7 +110,7 @@ func HandleAjaxFolders(resp http.ResponseWriter, req *http.Request) {
 		payload.Error = err.Error()
 	}
 
-	base.SendPayload(resp, payload)
+	base.WriteJSON(resp, payload)
 	//json_str, _ := json.MarshalIndent(payload, "" , "  ")
 	//fmt.Fprint(resp, string(json_str))
 }

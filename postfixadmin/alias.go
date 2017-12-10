@@ -110,25 +110,20 @@ func CreateAliasPayload() AliasPayload {
 
 // /alias/<email>
 func HandleAjaxAlias(resp http.ResponseWriter, req *http.Request) {
-	fmt.Println("AliasAjaxHandler")
-
-	if base.AjaxAuth(resp, req) == false {
-		return
-	}
 
 	payload := CreateAliasPayload()
 	vars := mux.Vars(req)
 
 	if vars["email"] == "new" {
 		payload.Alias = new(Alias)
-		base.SendPayload(resp, payload)
+		base.WriteJSON(resp, payload)
 		return
 	}
 
 	addr, erra := ParseAddress(vars["email"])
 	if erra != nil {
 		payload.Error = erra.Error()
-		base.SendPayload(resp, erra)
+		base.WriteJSON(resp, erra)
 		return
 	}
 
@@ -162,5 +157,5 @@ func HandleAjaxAlias(resp http.ResponseWriter, req *http.Request) {
 
 	}
 
-	base.SendPayload(resp, payload)
+	base.WriteJSON(resp, payload)
 }

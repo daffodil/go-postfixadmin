@@ -42,9 +42,6 @@ type VacationNotificationsPayload struct {
 // Handles /ajax/vacation/<email>
 func HandleAjaxVacationNotifications(resp http.ResponseWriter, req *http.Request) {
 
-	if base.AjaxAuth(resp, req) == false {
-		return
-	}
 
 	payload := VacationNotificationsPayload{}
 	payload.Success = true
@@ -55,5 +52,5 @@ func HandleAjaxVacationNotifications(resp http.ResponseWriter, req *http.Request
 		payload.Error = err.Error()
 	}
 
-	base.SendPayload(resp, payload)
+	base.WriteJSON(resp, payload)
 }

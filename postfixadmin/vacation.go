@@ -72,12 +72,6 @@ func VacationExists(address string) bool {
 // /vacation/<email>
 func HandleAjaxVacation(resp http.ResponseWriter, req *http.Request) {
 
-	if base.AjaxAuth(resp, req) == false {
-		return
-	}
-
-	fmt.Println("VacationsAjaxHandler")
-
 	payload := VacationPayload{}
 	payload.Success = true //extjs fu
 
@@ -138,7 +132,7 @@ func HandleAjaxVacation(resp http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	base.SendPayload(resp, payload)
+	base.WriteJSON(resp, payload)
 }
 
 // Updates a Vacation record

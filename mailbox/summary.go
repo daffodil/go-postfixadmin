@@ -44,11 +44,6 @@ type SummaryPayload struct {
 
 func HandleAjaxSummary(resp http.ResponseWriter, req *http.Request) {
 
-
-	if base.AjaxAuth(resp, req) == false {
-		return
-	}
-
 	client := CreateImapClient(resp, req)
 	if client == nil {
 		return
@@ -153,7 +148,7 @@ func HandleAjaxSummary(resp http.ResponseWriter, req *http.Request) {
 	}
 
 
-	base.SendPayload(resp, payload)
+	base.WriteJSON(resp, payload)
 
 
 }

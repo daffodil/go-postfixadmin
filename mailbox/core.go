@@ -27,7 +27,7 @@ func Initialize( conff *base.Config){
 	conf = conff
 
 	tlsConfig = new(tls.Config)
-	tlsConfig.ServerName = conf.ImapServer
+	tlsConfig.ServerName = conf.IMAPServer.Server
 	tlsConfig.InsecureSkipVerify = true
 
 }

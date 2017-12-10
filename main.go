@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
@@ -19,14 +20,16 @@ import (
 	"github.com/daffodil/go-postfixadmin/sendmail"
 )
 
-func main() {
+var config *base.Config
+var Db *sql.DB
 
-	config_file := flag.String("config", "config.yaml", "Config file")
-	flag.Parse()
+func App(config_file string) http.Handler {
+
+
 
 	// Create and load config.yaml
-	config := new(base.Config)
-	contents, e := ioutil.ReadFile(*config_file)
+	config = new(base.Config)
+	contents, e := ioutil.ReadFile(config_file)
 	if e != nil {
 		fmt.Printf("Config File Error: %v\n", e)
 		fmt.Printf("create one with -w \n")
@@ -39,7 +42,8 @@ func main() {
 
 	// Create Database connection + ping
 	data_source := config.Db.User + ":" + config.Db.Password + "@" + config.Db.Server + "/" + config.Db.Database
-	var Db *sql.DB
+	fmt.Println("dsn=", data_source)
+
 	var err_db error
 	Db, err_db = sql.Open(config.Db.Engine, data_source)
 	if err_db != nil {
@@ -51,26 +55,24 @@ func main() {
 		fmt.Printf("Db Ping Failed: ", err_ping, "=", config.Db.Engine, data_source)
 		os.Exit(1)
 	}
-	defer Db.Close()
 
+	fmt.Println("ere")
 	// Initialize modules
 	base.Initialize(config)
 	mailbox.Initialize(config)
 	postfixadmin.Initialize(config, Db)
 	sendmail.Initialize(config)
 
-
 	// Main router
 	BASE := "/api/v1"
-	router := mux.NewRouter()
+	router := mux.NewRouter().StrictSlash(false)
 
 	//= Base
 	router.HandleFunc(BASE, base.HandleAjaxInfo)
 
-
 	//= Postfixadmin
 	//pfaRouter := mux.NewRouter().PathPrefix(BASE + "/admin").Subrouter().StrictSlash(true)
-	pfaRouter := router.PathPrefix("/admin").Subrouter()
+	pfaRouter := router.PathPrefix(BASE + "/admin").Subrouter()
 
 	pfaRouter.HandleFunc("/domains", postfixadmin.HandleAjaxDomains)
 	pfaRouter.HandleFunc("/domain/{domain}", postfixadmin.HandleAjaxDomain)
@@ -93,7 +95,6 @@ func main() {
 
 	pfaRouter.HandleFunc("/api/v1/admin/cron", base.HandleAjaxCron)
 
-
 	//= SendMail
 	router.HandleFunc("/api/v1/smtp/send_test", sendmail.HandleAjaxSendTest)
 
@@ -102,22 +103,25 @@ func main() {
 	router.HandleFunc("/api/v1/mailbox/{address}/folders", mailbox.HandleAjaxFolders)
 	router.HandleFunc("/api/v1/mailbox/{address}/message/{folder}/{uid}", mailbox.AjaxMessageHandler)
 
-	//router.PathPrefix(BASE + "/admin").Handler(negroni.New(
-	//	Middleware1,
-	//	Middleware2,
-	//	negroni.Wrap(subRouter),
-	//))
-	common_midware := negroni.New()
-	common_midware.UseHandler(router)
+	// Setup middleware
+	neg := negroni.Classic()
 
-	//router.PathPrefix(BASE + "/admin").Handler(common_midware.With(
-		//APIMiddleware1,
-	//	negroni.Wrap(pfaRouter),
-	//))
-	// Start Http Server
-	fmt.Println("Serving on " + config.HTTPListen)
-	//http.Handle("/", router)
-	//http.ListenAndServe(config.HTTPListen, n)
-	common_midware.Run(config.HTTPListen)
+	neg.Use(negroni.HandlerFunc(base.AuthMiddleware))
+	neg.UseHandler(router)
 
+	return neg
 }
+
+func main(){
+	// Start Http Server
+	//neg := App()
+	//defer Db.Close()
+
+	config_file := flag.String("config", "config.yaml", "Config file")
+	flag.Parse()
+
+	//neg := App(*config_file)
+	//neg.Run(config.HTTPListen)
+	http.ListenAndServe(config.HTTPListen, App(*config_file) )
+}
+

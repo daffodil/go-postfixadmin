@@ -22,7 +22,7 @@ func SendMessage(mess Message) error {
 	m.SetHeader("Subject", mess.Subject)
 	m.SetBody("text/plain", mess.Body)
 
-	c := gomail.NewPlainDialer(Conf.SMTPLogin.Server, Conf.SMTPLogin.Port, Conf.SMTPLogin.Login, Conf.SMTPLogin.Password)
+	c := gomail.NewPlainDialer(Conf.SMTPServer.Server, Conf.SMTPServer.Port, Conf.SMTPServer.Login, Conf.SMTPServer.Password)
 	c.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	err := c.DialAndSend(m)

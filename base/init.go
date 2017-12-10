@@ -12,6 +12,6 @@ func Initialize( conff *Config){
 	conf = conff
 
 	// Umm?? nrevous..
-	StartCron()
+	//StartCron()
 
 }
